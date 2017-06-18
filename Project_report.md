@@ -31,7 +31,7 @@ In `main.cpp` you will find that the pre-processing step for latency has been co
 >           // psi += v * steer_value * latency / Lf;
 >           // v += throttle_value * latency;
 
-The following code translates the location of the car and it's waypoints from global coordinates to vehicle coordinate system (ie x, y and psi are 0). The waypoints `ptsx, ptsy` equations is derived using geometry. See [here](https://discussions.udacity.com/t/mpc-car-space-conversion-and-output-of-solve-intuition/249469/11) for an excellent diagram.
+The following code translates the location of the car and it's waypoints from global coordinates to vehicle coordinate system (ie x, y and psi are 0). The waypoints `ptsx, ptsy` equations are derived using geometry. See [here](https://discussions.udacity.com/t/mpc-car-space-conversion-and-output-of-solve-intuition/249469/11) for an excellent diagram.
 
 >          // Translate the ref traj from global to vehicle coords
 >          // Vehicle is at (px, py). To change to vehicle coords subtract px from x and py from y
