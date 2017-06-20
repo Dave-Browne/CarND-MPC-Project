@@ -55,7 +55,7 @@ The new coordintates are fitted to a polynomial as using the polyfit function.
 >          auto coeffs = polyfit(ptsx_, ptsy_, order);
 
 ### Latency
-Latency is dealt with by predicting the vehicle state at the latency time (0.1s). All 6 states variables need to be predicted at the latency time. To do this `px`, `py`, `psi` and `v` were predicted at 0.1s. These were then translated to vehicle coordinates. This new state was then used to calculate `cte` and `epsi`. Since the state is already at 0.1s, `dt = 0` and so the terms `(v*sin(epsi)*dt) = 0` for `cte'` and `v/Lf*delta*dt = 0` for `epsi'`. The resulting equations are shown below.
+Latency is dealt with by predicting the vehicle state at the latency time (0.1s). All 6 state variables need to be predicted at the latency time. To do this `px`, `py`, `psi` and `v` were predicted at 0.1s. These were then translated to vehicle coordinates. This new state was then used to calculate `cte` and `epsi`. Since the state is already at 0.1s, `dt = 0` and so the terms `(v*sin(epsi)*dt) = 0` for `cte'` and `v/Lf*delta*dt = 0` for `epsi'`. The resulting equations are shown below.
 
 It seems that running the simulator on higher resolution and quality levels increases computation time and therefore adds additional latency, but it wasn't necessary to account for this in this implementation.
 
@@ -81,22 +81,22 @@ Reference velocity
 
 Cost function
 
->    fg[0] = 0;
+>           fg[0] = 0;
 >
->    // Cost from reference state
->    for (size_t i=0; i<N; ++i) {
->      fg[0] += CppAD::pow(vars[cte_start + i] - ref_cte, 2);          // penalise cte
->      fg[0] += 250 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);        // penalise epsi
->      fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
->    }
->    // Cost from actuators - minimise the use of actuators
->    for (size_t i=0; i<N-1; ++i) {
->      fg[0] += CppAD::pow(vars[delta_start + i], 2);
->      fg[0] += CppAD::pow(vars[a_start + i], 2);
->    }
->    // Cost from actuators - minimise the use of extreme turns/accelerations
->    // (ie minimise the value gap between sequential actuations)
->    for (size_t i=0; i<N-2; ++i) {
->      fg[0] += 150 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);      // smoothing steer angle
->      fg[0] += CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
->    }
+>           // Cost from reference state
+>           for (size_t i=0; i<N; ++i) {
+>             fg[0] += CppAD::pow(vars[cte_start + i] - ref_cte, 2);          // penalise cte
+>             fg[0] += 250 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);        // penalise epsi
+>             fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
+>           }
+>           // Cost from actuators - minimise the use of actuators
+>           for (size_t i=0; i<N-1; ++i) {
+>             fg[0] += CppAD::pow(vars[delta_start + i], 2);
+>             fg[0] += CppAD::pow(vars[a_start + i], 2);
+>           }
+>           // Cost from actuators - minimise the use of extreme turns/accelerations
+>           // (ie minimise the value gap between sequential actuations)
+>           for (size_t i=0; i<N-2; ++i) {
+>             fg[0] += 150 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);      // smoothing steer angle
+>             fg[0] += CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
+>           }
