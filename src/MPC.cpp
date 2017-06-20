@@ -25,7 +25,7 @@ const double Lf = 2.67;
 // Reference values
 const int ref_cte = 0;
 const int ref_epsi = 0;
-const int ref_v = 60;
+const double ref_v = 80 * 1600 / 3600;    // convert from mph to m/s
 
 // The solver (Ipopt) takes all the state variables and actuator
 // variables in a singular vector. Thus, we should to establish
@@ -63,19 +63,19 @@ class FG_eval {
 
     // Cost from reference state
     for (size_t i=0; i<N; ++i) {
-      fg[0] += 3000 * CppAD::pow(vars[cte_start + i] - ref_cte, 2);        // penalise cte
-      fg[0] += 3000 * CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);       // penalise epsi
-      fg[0] += 4 * CppAD::pow(vars[v_start + i] - ref_v, 2);
+      fg[0] += CppAD::pow(vars[cte_start + i] - ref_cte, 2);          // penalise cte
+      fg[0] += 250*CppAD::pow(vars[epsi_start + i] - ref_epsi, 2);        // penalise epsi
+      fg[0] += CppAD::pow(vars[v_start + i] - ref_v, 2);
     }
     // Cost from actuators - minimise the use of actuators
     for (size_t i=0; i<N-1; ++i) {
-      fg[0] += 50 * CppAD::pow(vars[delta_start + i], 2);
-      fg[0] += 50 * CppAD::pow(vars[a_start + i], 2);
+      fg[0] += CppAD::pow(vars[delta_start + i], 2);
+      fg[0] += CppAD::pow(vars[a_start + i], 2);
     }
     // Cost from actuators - minimise the use of extreme turns/accelerations
     // (ie minimise the value gap between sequential actuations)
     for (size_t i=0; i<N-2; ++i) {
-      fg[0] += 500 * CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);      // smoothing steer angle
+      fg[0] += 150*CppAD::pow(vars[delta_start + i + 1] - vars[delta_start + i], 2);      // smoothing steer angle
       fg[0] += CppAD::pow(vars[a_start + i + 1] - vars[a_start + i], 2);
     }
 
@@ -111,10 +111,8 @@ class FG_eval {
       AD<double> delta0 = vars[delta_start + i - 1];
       AD<double> a0 = vars[a_start + i - 1];
 
-//      AD<double> f0 = coeffs[3]*x0*x0*x0 + coeffs[2]*x0*x0 + coeffs[1]*x0 + coeffs[0];
-      AD<double> f0 = coeffs[2]*x0*x0 + coeffs[1]*x0 + coeffs[0];
-//      AD<double> derivative = 3*coeffs[3]*x0*x0 + 2*coeffs[2]*x0 + coeffs[1];
-      AD<double> derivative = 2*coeffs[2]*x0 + coeffs[1];
+      AD<double> f0 = coeffs[3]*x0*x0*x0 + coeffs[2]*x0*x0 + coeffs[1]*x0 + coeffs[0];
+      AD<double> derivative = 3*coeffs[3]*x0*x0 + 2*coeffs[2]*x0 + coeffs[1];
       AD<double> psides0 = CppAD::atan(derivative);
 
       // The idea here is to constraint this value to be 0, so
@@ -170,13 +168,6 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   for (int i = 0; i < n_vars; i++) {
     vars[i] = 0.0;
   }
-  // Initialise the initial state values
-  vars[x_start] = x;                      // not in walkthrough
-  vars[y_start] = y;
-  vars[psi_start] = psi;
-  vars[v_start] = v;
-  vars[cte_start] = cte;
-  vars[epsi_start] = epsi;
 
   // TODO: Set upper and lower limits for variables.
   Dvector vars_lowerbound(n_vars);

@@ -116,13 +116,20 @@ int main() {
           *   throttle (float) - The current throttle value [-1, 1].
           *   speed (float) - The current velocity in mph.
           */
+          // Convert v from mph to m/s
+          // Simulator sends velocity in mph and waypoints are given in m
+          v = v * 1600 / 3600;
+
+          // Change steering angle to allow for counter steering
+          steer_value *= -1;
+
           // Accomodate for latency - predict px, py, psi & v at time latency
           double latency = 0.1;
           double Lf = 2.67;
-//          px += v * cos(psi) * latency;
-//          py += v * sin(psi) * latency;
-//          psi += v * steer_value * latency / Lf;
-//          v += throttle_value * latency;
+          px += v * cos(psi) * latency;
+          py += v * sin(psi) * latency;
+          psi += v * steer_value * latency / Lf;
+          v += throttle_value * latency;
 
           // Translate the ref traj from global to vehicle coords
           // Vehicle is at (px, py). To change to vehicle coords subtract px from x and py from y
@@ -144,8 +151,7 @@ int main() {
           // Find the polynomial coefficients for the reference trajectory
           // Polynomial of 3rd order: f(x) = Ax^3 + Bx^2 + Cx + D
           //             Derivative: f'(x) = 3Ax^2 + 2Bx + C
-//          order = 3;
-          order = 2;
+          order = 3;
           auto coeffs = polyfit(ptsx_, ptsy_, order);
 
           // Find cte, the distance of vehicle from the ref traj.
@@ -153,8 +159,7 @@ int main() {
           cte = polyeval(coeffs, px) - py;
 
           // Find epsi, the difference between vehicle orientation and ref traj orientation.
-//          derivative = 3*coeffs[3]*px*px + 2*coeffs[2]*px + coeffs[1];
-          derivative = 2*coeffs[2]*px + coeffs[1];
+          derivative = 3*coeffs[3]*px*px + 2*coeffs[2]*px + coeffs[1];
           epsi = psi - atan(derivative);
 
           // State vector
