@@ -1,5 +1,9 @@
 ## Model Predictive Control
 
+### Project Instructions
+
+Implement a Model Predictive Controller to drive the Udacity Simulator car around the track. Unlike the PID control project, the cross track error is not given, and needs to be calculated. Additionally, there's a 100 millisecond latency between actuations commands on top of the connection latency.
+
 ### Model
 
 The model is made up of the vehicle state and actuators. The state vector consists of the x and y positions of the car (`px, py`), the orientation (`psi`), velocity (`v`), cross track error (`cte`) and orientation error (`epsi`).
