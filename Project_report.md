@@ -31,7 +31,7 @@ Secondly, the steering value must be multiplied by -1 to counter-steer the car b
 
 >           steer_value *= -1;
 
-The following code translates the location of the car and it's waypoints from global coordinates to vehicle coordinate system (ie x, y and psi are 0). The waypoints `ptsx, ptsy` equations are derived using geometry. See [here](https://discussions.udacity.com/t/mpc-car-space-conversion-and-output-of-solve-intuition/249469/11) for an excellent diagram. `px`, `py` and `psi` are now 0 and the mpc solver becomes much simpler.
+The following code translates the location of the car and it's waypoints from global coordinates to vehicle coordinate system (ie x, y and psi are 0). The waypoints `ptsx, ptsy` equations are derived using geometry. See [this](https://discussions.udacity.com/t/mpc-car-space-conversion-and-output-of-solve-intuition/249469/11) excellent diagram. `px`, `py` and `psi` are now 0 and the mpc solver becomes much simpler.
 
 >          // Translate the ref traj from global to vehicle coords
 >          // Vehicle is at (px, py). To change to vehicle coords subtract px from x and py from y
@@ -72,7 +72,7 @@ It seems that running the simulator on higher resolution and quality levels incr
 >           derivative = 3*coeffs[3]*px*px + 2*coeffs[2]*px + coeffs[1];
 >           epsi = psi - atan(derivative);
 
-### Reference Velocity amnd Tuning
+### Reference Velocity and Tuning
 A reference velocity must be chosen and the cost function tuned accordingly. The goal is to SAFELY drive on the road at the fastest speed possible. The tuned cost function allows the car to SAFELY complete the track under all resolution and graphics quality settings.
 
 Reference velocity
